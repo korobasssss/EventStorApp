@@ -10,7 +10,7 @@ import java.util.stream.Stream;
 
 public class ComponentFactory {
 
-    private final String strPackage = "ru.vsu.cs.korobeynikova.application";
+    private final String strPackage = "org.example.korobeynikova.application";
     private Map<String, Object> components;
     private Set<Class<?>> classes;
 
@@ -42,7 +42,7 @@ public class ComponentFactory {
                     field.setAccessible(true);
                     if (components.containsKey(field.getType().getName())) {
                         field.set(exemplar, components.get(field.getType().getName()));
-                    } else if (Stream.of(Component.class).anyMatch(field.getType()::isAnnotationPresent)) {
+                    } else if (Stream.of(Component.class, DAO.class).anyMatch(field.getType()::isAnnotationPresent)) {
                         Object objectForField = makeComponent(field.getType());
                         components.put(field.getType().getName(), objectForField);
                         field.set(exemplar, objectForField);

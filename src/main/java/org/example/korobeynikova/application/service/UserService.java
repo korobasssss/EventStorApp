@@ -3,15 +3,13 @@ package org.example.korobeynikova.application.service;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import org.example.korobeynikova.application.database.repository.EventRepository;
-import org.example.korobeynikova.application.database.repository.UserRepository;
-import org.example.korobeynikova.application.entity.EventEntity;
+import org.example.korobeynikova.application.database.db.EventDAO;
+import org.example.korobeynikova.application.database.db.UserDAO;
 import org.example.korobeynikova.application.entity.UserEntity;
 import org.example.korobeynikova.di.annotation.Autowired;
 import org.example.korobeynikova.di.annotation.Component;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Getter
@@ -20,45 +18,47 @@ import java.util.Objects;
 @NoArgsConstructor
 public class UserService {
 
-    private UserRepository userRepository;
-    private EventRepository eventRepository;
+    private UserDAO userDAO;
+    private EventDAO eventDAO;
 
     @Autowired
-    public UserService(UserRepository userRepository, EventRepository eventRepository) {
-        this.userRepository = userRepository;
-        this.eventRepository = eventRepository;
+    public UserService(UserDAO userDAO, EventDAO eventDAO) {
+        this.userDAO = userDAO;
+        this.eventDAO = eventDAO;
     }
 
     public void addEventToUser(int userId, int eventId) {
-        String newUsersEvent = userRepository.getUserById(userId).getEntityList();
+        UserEntity us = userDAO.getUserById(userId);
+        String newUsersEvent = us.getEntityList();
         newUsersEvent += " " + eventId;
-        userRepository.updateUser(userId, newUsersEvent);
+        us.setEntityList(newUsersEvent);
+        userDAO.updateUser(userId, us);
     }
 
     public boolean addUser(String[] newUser) {
         if (checkUnique(newUser[1])) {
             UserEntity user = new UserEntity(newUser[0], newUser[1], newUser[2]);
-            userRepository.setUser(user);
+            userDAO.setUser(user);
             return true;
         }
         return false;
     }
 
     public UserEntity getUser(int id) {
-        return userRepository.getUserById(id);
+        return userDAO.getUserById(id);
     }
 
     public void deleteUser(int id) {
-        UserEntity user = userRepository.getUserById(id);
+        UserEntity user = userDAO.getUserById(id);
         String[] arr = user.getEntityList().split(" ");
         for (String index : arr) {
-            eventRepository.deleteEvent(Integer.getInteger(index));
+            eventDAO.deleteEvent(Integer.getInteger(index));
         }
-        userRepository.deleteUserById(id);
+        userDAO.deleteUserById(id);
     }
 
     public String showAll() {
-        HashMap<Integer, UserEntity> allUsers = userRepository.getAllUsers();
+        Map<Integer, UserEntity> allUsers = userDAO.getAllUsers();
         StringBuilder mapStr = new StringBuilder("{");
         for (Integer key : allUsers.keySet()) {
             mapStr.append(key + ": " + allUsers.get(key).toString() + ",\n");
@@ -72,7 +72,7 @@ public class UserService {
     }
 
     private boolean checkUnique(String login) {
-        HashMap<Integer, UserEntity> allUsers = userRepository.getAllUsers();
+        Map<Integer, UserEntity> allUsers = userDAO.getAllUsers();
         if (allUsers.isEmpty()) {
             return true;
         } else {

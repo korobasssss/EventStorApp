@@ -7,16 +7,14 @@ import org.example.korobeynikova.di.annotation.DAO;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @DAO
 public class EventDAO {
 
     private static final String URL = "jdbc:postgresql://localhost:5432/maindatabase";
-    private static final String USERNAME = "postgres"; //idc
+    private static final String USERNAME = "postgres";
     private static final String PASSWORD = "postgres";
 
     private static Connection connection;
@@ -37,7 +35,7 @@ public class EventDAO {
 
     public void setEvent(EventEntity event) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO event (type, title, data, description) VALUES(?::event_type, ?, ?, ?)");
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO event (type, title, date, description) VALUES(?::event_type, ?, ?, ?)");
 
             preparedStatement.setString(1, event.getType().toString());
             preparedStatement.setString(2, event.getTitle());
@@ -91,13 +89,14 @@ public class EventDAO {
         return size;
     }
 
-    public void updateById(Integer id, EventEntity newEvent){
+    public void changeEventById(Integer id, EventEntity newEvent){
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE car SET brand=?, model=?, type=?::car_type, sold=? WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE event SET type=?::event_type, title=?, data=?, description=? WHERE id=?");
 
+            String dateString = newEvent.getData().format(new java.util.Date());
             preparedStatement.setString(1, newEvent.getType().toString());
             preparedStatement.setString(2, newEvent.getTitle());
-            preparedStatement.setDate(3, (Date) newEvent.getData().parse(newEvent.getData().toString()));
+            preparedStatement.setDate(3, new Date(newEvent.getData().parse(dateString).getTime()) );
             preparedStatement.setString(4, newEvent.getDescription());
             preparedStatement.setInt(5, id);
 
@@ -109,7 +108,7 @@ public class EventDAO {
         }
     }
 
-    public Map<Integer, EventEntity> getAll() {
+    public Map<Integer, EventEntity> getAllEvents() {
         Map<Integer, EventEntity> events = new HashMap<>();
 
         try {
@@ -124,7 +123,7 @@ public class EventDAO {
                 index = resultSet.getInt("id");
                 eventEntity.setType(EventType.valueOf(resultSet.getString("type")));
                 eventEntity.setTitle(resultSet.getString("title"));
-                eventEntity.setData(new SimpleDateFormat(resultSet.getString("date")));
+                eventEntity.setData(new SimpleDateFormat(resultSet.getString("data")));
                 eventEntity.setDescription(resultSet.getString("description"));
 
                 events.put(index, eventEntity);

@@ -4,7 +4,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.example.korobeynikova.application.database.db.EventDAO;
-import org.example.korobeynikova.application.database.repository.EventRepository;
 import org.example.korobeynikova.application.entity.EventEntity;
 import org.example.korobeynikova.application.entity.enums.EventType;
 import org.example.korobeynikova.di.annotation.Autowired;
@@ -12,6 +11,7 @@ import org.example.korobeynikova.di.annotation.Component;
 
 import java.text.SimpleDateFormat;
 import java.util.HashMap;
+import java.util.Map;
 
 @Getter
 @Setter
@@ -19,30 +19,29 @@ import java.util.HashMap;
 @NoArgsConstructor
 public class EventService {
 
-    private EventRepository eventRepository;
     private EventDAO eventDAO;
 
     @Autowired
-    public EventService(EventRepository eventRepository) {
-        this.eventRepository = eventRepository;
+    public EventService(EventDAO eventDAO) {
+        this.eventDAO = eventDAO;
     }
 
     public void addEvent(String[] newEvent) {
         EventEntity event = makeEvent(newEvent);
-        eventRepository.setEvent(event);
+        eventDAO.setEvent(event);
     }
 
     public int getLastEventsId() {
-        return eventRepository.getSize() - 1;
+        return eventDAO.size() - 1;
     }
 
     public void updateEventData(String[] newEvent, int id) {
         EventEntity event = makeEvent(newEvent);
-        eventRepository.changeEventById(id, event);
+        eventDAO.changeEventById(id, event);
     }
 
     public String showAllEvents() {
-        HashMap<Integer, EventEntity> allEvents = eventRepository.getAllEvents();
+        Map<Integer, EventEntity> allEvents = eventDAO.getAllEvents();
         StringBuilder mapStr = new StringBuilder("{");
         for (Integer key : allEvents.keySet()) {
             mapStr.append(key + ": " + allEvents.get(key).toString() + ",\n");
@@ -59,7 +58,7 @@ public class EventService {
         StringBuilder mapUserEventsStr = new StringBuilder("{");
         String[] arr = index.split(" ");
         for (String i : arr) {
-            mapUserEventsStr.append(i + ": " + eventRepository.getEventById(Integer.valueOf(i)).toString() + ", \n");
+            mapUserEventsStr.append(i + ": " + eventDAO.getEventById(Integer.valueOf(i)).toString() + ", \n");
         }
         if (mapUserEventsStr.length() > 1) {
             mapUserEventsStr.delete(mapUserEventsStr.length() - 3, mapUserEventsStr.length()).append("}");

@@ -10,13 +10,6 @@ import java.util.Map;
 @DAO
 public class UserDAO {
 
-    private EventDAO eventDAO;
-
-    @Autowired
-    public UserDAO(EventDAO eventDAO) {
-        this.eventDAO = eventDAO;
-    }
-
     private static final String URL = "jdbc:postgresql://localhost:5432/maindatabase";
     private static final String USERNAME = "postgres"; //idc
     private static final String PASSWORD = "postgres";
@@ -53,7 +46,7 @@ public class UserDAO {
         }
     }
 
-    public UserEntity getById(Integer id){
+    public UserEntity getUserById(Integer id){
         UserEntity userEntity = null;
 
         try {
@@ -71,7 +64,7 @@ public class UserDAO {
             userEntity.setName(resultSet.getString("name"));
             userEntity.setLogin(resultSet.getString("login"));
             userEntity.setPassword(resultSet.getString("password"));
-            userEntity.setEntityList(resultSet.getString("entityList"));
+            userEntity.setEntityList(resultSet.getString("eventsIndex"));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -124,12 +117,12 @@ public class UserDAO {
         }
     }
 
-    public Map<Integer, UserEntity> getAll() {
+    public Map<Integer, UserEntity> getAllUsers() {
         Map<Integer, UserEntity> customers = new HashMap<>();
 
         try {
             Statement statement = connection.createStatement();
-            String SQL = "SELECT * FROM users_event";
+            String SQL = "SELECT * FROM user_event";
             ResultSet resultSet = statement.executeQuery(SQL);
 
             while (resultSet.next()) {
@@ -140,7 +133,7 @@ public class UserDAO {
                 userEntity.setName(resultSet.getString("name"));
                 userEntity.setLogin(resultSet.getString("login"));
                 userEntity.setPassword(resultSet.getString("password"));
-                userEntity.setEntityList(resultSet.getString("entityList"));
+                userEntity.setEntityList(resultSet.getString("eventsIndex"));
 
                 customers.put(index, userEntity);
             }
