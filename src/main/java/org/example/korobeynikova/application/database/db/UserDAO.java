@@ -1,39 +1,21 @@
 package org.example.korobeynikova.application.database.db;
 
 import org.example.korobeynikova.application.entity.UserEntity;
-import org.example.korobeynikova.di.annotation.Autowired;
 import org.example.korobeynikova.di.annotation.DAO;
 
 import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
 @DAO
 public class UserDAO {
+    private Connection connection = ConnectionDB.getConnection();
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/maindatabase";
-    private static final String USERNAME = "postgres"; //idc
-    private static final String PASSWORD = "postgres";
-
-    private static Connection connection;
-
-    static {
-        try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    public void setUser(UserEntity userEntity) {
+    public void addUser(UserEntity userEntity) {
         try {
             PreparedStatement preparedStatement =
-                    connection.prepareStatement("INSERT INTO user_event (name, login, password, entityList) VALUES(?, ?, ?, ?)");
+                    connection.prepareStatement("INSERT INTO user_event (name, login, password, eventsindex) VALUES(?, ?, ?, ?)");
 
             preparedStatement.setString(1, userEntity.getName());
             preparedStatement.setString(2, userEntity.getLogin());
@@ -90,7 +72,7 @@ public class UserDAO {
 
     public void deleteUserById(Integer id) {
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM users_event WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("DELETE FROM user_event WHERE id=?");
 
             preparedStatement.setInt(1, id);
 
@@ -100,16 +82,26 @@ public class UserDAO {
         }
     }
 
-    public void updateUser(Integer id, UserEntity newCustomer) {
+    public void addEventToUser(Integer userId, Integer eventId) {
         try {
             PreparedStatement preparedStatement =
-                    connection.prepareStatement("UPDATE customer SET name=?, surname=?, age=?, gender=? WHERE id=?");
+                    connection.prepareStatement("UPDATE user_event SET name=?, login=?, password=?, eventsindex=? WHERE id=?");
 
-            preparedStatement.setString(1, newCustomer.getName());
-            preparedStatement.setString(2, newCustomer.getLogin());
-            preparedStatement.setString(3, newCustomer.getPassword());
-            preparedStatement.setString(4, newCustomer.getEntityList());
-            preparedStatement.setInt(5, id);
+            UserEntity user = getUserById(userId);
+            String newUsersEvent = user.getEntityList();
+            if (Objects.equals(newUsersEvent, "")) {
+                newUsersEvent = String.valueOf(eventId);
+            } else {
+                newUsersEvent += " " + eventId;
+            }
+            user.setEntityList(newUsersEvent);
+
+
+            preparedStatement.setString(1, user.getName());
+            preparedStatement.setString(2, user.getLogin());
+            preparedStatement.setString(3, user.getPassword());
+            preparedStatement.setString(4, user.getEntityList());
+            preparedStatement.setInt(5, userId);
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
@@ -133,7 +125,7 @@ public class UserDAO {
                 userEntity.setName(resultSet.getString("name"));
                 userEntity.setLogin(resultSet.getString("login"));
                 userEntity.setPassword(resultSet.getString("password"));
-                userEntity.setEntityList(resultSet.getString("eventsIndex"));
+                userEntity.setEntityList(resultSet.getString("eventsindex"));
 
                 customers.put(index, userEntity);
             }

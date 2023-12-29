@@ -9,8 +9,6 @@ import org.example.korobeynikova.application.entity.enums.EventType;
 import org.example.korobeynikova.di.annotation.Autowired;
 import org.example.korobeynikova.di.annotation.Component;
 
-import java.text.SimpleDateFormat;
-import java.util.HashMap;
 import java.util.Map;
 
 @Getter
@@ -28,7 +26,7 @@ public class EventService {
 
     public void addEvent(String[] newEvent) {
         EventEntity event = makeEvent(newEvent);
-        eventDAO.setEvent(event);
+        eventDAO.addEvent(event);
     }
 
     public int getLastEventsId() {
@@ -69,12 +67,8 @@ public class EventService {
     }
 
     private EventEntity makeEvent (String[] newEvent) {
-        return  (newEvent.length == 4) ? new EventEntity(EventType.valueOf(newEvent[0]),
-                                                         newEvent[1],
-                                                         new SimpleDateFormat(newEvent[2]),
-                                                         newEvent[3])
-                                       : new EventEntity(EventType.valueOf(newEvent[0]),
-                                                         newEvent[1],
-                                                         new SimpleDateFormat(newEvent[2]));
+        return  new EventEntity(EventType.valueOf(newEvent[0]),
+                newEvent[1],
+                newEvent[2]);
     }
 }

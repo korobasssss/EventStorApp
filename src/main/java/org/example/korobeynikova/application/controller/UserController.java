@@ -8,6 +8,7 @@ import org.example.korobeynikova.application.service.UserService;
 import org.example.korobeynikova.di.annotation.Autowired;
 import org.example.korobeynikova.di.annotation.Component;
 
+import java.sql.Array;
 import java.util.List;
 import java.util.Scanner;
 
@@ -27,9 +28,7 @@ public class UserController {
         this.scanner = scanner;
     }
     public void addEventToUser(int eventId) {
-        System.out.println("Введите ID юзера");
-        System.out.println("<ID юзера>");
-        userService.addEventToUser(scanner.nextInt(), eventId);
+        userService.addEventToUser(eventId + 1);
     }
     public void addUser() {
         System.out.println("Введите данные юзера");
@@ -40,18 +39,24 @@ public class UserController {
         }
     }
     public void deleteUser() {
-        System.out.println("Введите id юзера");
-        System.out.println("<id>");
-        int id = scanner.nextInt();
-        userService.deleteUser(id);
+        userService.deleteUser();
+    }
+
+    public boolean entryUser() {
+        String[] userData = new String[2];
+        System.out.println("Введите логин и пароль");
+        System.out.println("<login>");
+        userData[0] = scanner.nextLine();
+        System.out.println("<password>");
+        userData[1] = scanner.nextLine();
+        System.out.println(userService.entryUser(userData));
+        return userService.entryUser(userData);
     }
 
     public void showAllUserEvents(){
-        System.out.println("Введите id юзера");
-        System.out.println("<id>");
-        int id = scanner.nextInt();
-        String index = userService.getUser(id).getEntityList();
-        System.out.println(eventService.showAllUserEvents(index));
+        String index = userService.getUser().getEntityList();
+
+        System.out.println(index);
     }
     public void showAll() {
         System.out.println(userService.showAll());

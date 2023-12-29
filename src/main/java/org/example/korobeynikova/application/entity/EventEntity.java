@@ -22,30 +22,18 @@ public class EventEntity {
     private String title;
     @Getter
     @Setter
-    private SimpleDateFormat data;
-    @Getter
-    @Setter
-    private String description;
+    private String data;
 
-    public EventEntity(EventType type, String title, SimpleDateFormat data, String description) {
-        this.type = type;
-        this.title = title;
-        this.data = data;
-        this.description = description;
-    }
-
-    public EventEntity(EventType type,String title, SimpleDateFormat data) {
+    public EventEntity(EventType type, String title, String data) {
         this.type = type;
         this.title = title;
         this.data = data;
     }
-
     @Override
     public String toString() {
         return "Event { " + type + ", " +
                 title + ", " +
-                data + ", " +
-                description + "}";
+                data + "}";
     }
 
 }

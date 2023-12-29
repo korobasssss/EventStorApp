@@ -31,36 +31,40 @@ public class MainController {
             System.out.println("Программа-органайзер для событий! ");
             System.out.println("Выберите действие: ");
             System.out.println("----------------------------------------------------------------");
-            System.out.println("/event_make/ - создать событие");
-            System.out.println("/event_edit/ - редактировать событие");
-            System.out.println("/events_show/ - вывести список всех событий");
-            System.out.println("/users_events_show/ - вывести список всех событий пользователя");
-            System.out.println("/users_show/ - вывести список всех пользователей");
-            System.out.println("/user_add/ - добавить пользователя");
-            System.out.println("/user_delete/ - удалить пользователя");
+            System.out.println("/event/make/ - создать событие");
+            System.out.println("/event/edit/ - редактировать событие");
+            System.out.println("/events/show/ - вывести список всех событий");
+            System.out.println("/users/events/show/ - вывести список всех событий пользователя");
+            System.out.println("/users/show/ - вывести список всех пользователей");
+            System.out.println("/user/add/ - добавить пользователя");
+            System.out.println("/user/delete/ - удалить пользователя");
+            System.out.println("/user/entry/ - войти в аккаунт");
             System.out.println("----------------------------------------------------------------");
 
             switch (scanner.nextLine()) {
-                case "/event_make/":
+                case "/event/make/":
                     eventController.addEvent();
                     break;
-                case "/event_edit/":
+                case "/event/edit/":
                     eventController.updateEventData();
                     break;
-                case "/events_show/":
+                case "/events/show/":
                     eventController.showAllEvents();
                     break;
-                case "/users_events_show/":
+                case "/users/events/show/":
                     userController.showAllUserEvents();
                     break;
-                case "/users_show/":
+                case "/users/show/":
                     userController.showAll();
                     break;
-                case "/user_add/":
+                case "/user/add/":
                     userController.addUser();
                     break;
-                case "/user_delete/":
+                case "/user/delete/":
                     userController.deleteUser();
+                    break;
+                case "/user/entry/":
+                    userController.entryUser();
                     break;
                 default: {
                     System.out.println("Запрос введен неправильно");

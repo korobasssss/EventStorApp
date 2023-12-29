@@ -31,7 +31,7 @@ public class EventController {
     }
 
     public void addEvent() {
-        String[] newEvent = new String[4];
+        String[] newEvent = new String[3];
 
         System.out.println("Введите тип события");
         System.out.println("<MEET / BIRTHDAY>");
@@ -42,9 +42,6 @@ public class EventController {
         System.out.println("Введите время события");
         System.out.println("<гггг-мм-дд>");
         newEvent[2] = scanner.nextLine();
-        System.out.println("Введите описание события");
-        System.out.println("<описание>");
-        newEvent[3] = scanner.nextLine();
 
         eventService.addEvent(newEvent);
         userController.addEventToUser(eventService.getLastEventsId());

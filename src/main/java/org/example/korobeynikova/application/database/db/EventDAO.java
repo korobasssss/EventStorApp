@@ -12,35 +12,21 @@ import java.util.Map;
 
 @DAO
 public class EventDAO {
+    private Connection connection = ConnectionDB.getConnection();
 
-    private static final String URL = "jdbc:postgresql://localhost:5432/maindatabase";
-    private static final String USERNAME = "postgres";
-    private static final String PASSWORD = "postgres";
 
-    private static Connection connection;
-
-    static {
+    public void addEvent(EventEntity event) {
         try {
-            Class.forName("org.postgresql.Driver");
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        }
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO event (type, title, data) VALUES(?::event_type, ?, ?)");
 
-        try {
-            connection = DriverManager.getConnection(URL, USERNAME, PASSWORD);
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
-        }
-    }
-
-    public void setEvent(EventEntity event) {
-        try {
-            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO event (type, title, date, description) VALUES(?::event_type, ?, ?, ?)");
+            String dateString = event.getData();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = dateFormat.parse(dateString);
+            Date sqlDate = new Date(utilDate.getTime());
 
             preparedStatement.setString(1, event.getType().toString());
             preparedStatement.setString(2, event.getTitle());
-            preparedStatement.setDate(3, (Date) event.getData().parse(event.getData().toString()));
-            preparedStatement.setString(4, event.getDescription());
+            preparedStatement.setDate(3, sqlDate);
 
             preparedStatement.executeUpdate();
         } catch (SQLException | ParseException throwables) {
@@ -64,8 +50,7 @@ public class EventDAO {
 
             eventEntity.setType(EventType.valueOf(resultSet.getString("type")));
             eventEntity.setTitle(resultSet.getString("title"));
-            eventEntity.setData(new SimpleDateFormat(resultSet.getString("date")));
-            eventEntity.setDescription(resultSet.getString("description"));
+            eventEntity.setData(resultSet.getString("data"));
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -91,14 +76,18 @@ public class EventDAO {
 
     public void changeEventById(Integer id, EventEntity newEvent){
         try {
-            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE event SET type=?::event_type, title=?, data=?, description=? WHERE id=?");
+            PreparedStatement preparedStatement = connection.prepareStatement("UPDATE event SET type=?::event_type, title=?, data=? WHERE id=?");
 
-            String dateString = newEvent.getData().format(new java.util.Date());
+            String dateString = newEvent.getData();
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            java.util.Date utilDate = dateFormat.parse(dateString);
+            java.sql.Date sqlDate = new java.sql.Date(utilDate.getTime());
+
+
             preparedStatement.setString(1, newEvent.getType().toString());
             preparedStatement.setString(2, newEvent.getTitle());
-            preparedStatement.setDate(3, new Date(newEvent.getData().parse(dateString).getTime()) );
-            preparedStatement.setString(4, newEvent.getDescription());
-            preparedStatement.setInt(5, id);
+            preparedStatement.setDate(3, sqlDate);
+            preparedStatement.setInt(4, id);
 
             preparedStatement.executeUpdate();
         } catch (SQLException throwables) {
@@ -123,8 +112,7 @@ public class EventDAO {
                 index = resultSet.getInt("id");
                 eventEntity.setType(EventType.valueOf(resultSet.getString("type")));
                 eventEntity.setTitle(resultSet.getString("title"));
-                eventEntity.setData(new SimpleDateFormat(resultSet.getString("data")));
-                eventEntity.setDescription(resultSet.getString("description"));
+                eventEntity.setData(resultSet.getString("data"));
 
                 events.put(index, eventEntity);
             }
