@@ -56,7 +56,8 @@ public class UserController {
     public void showAllUserEvents(){
         String index = userService.getUser().getEntityList();
 
-        System.out.println(index);
+
+        System.out.println(eventService.showAllUserEvents(index));
     }
     public void showAll() {
         System.out.println(userService.showAll());
